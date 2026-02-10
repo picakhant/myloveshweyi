@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-// Remove lucide-react dependency if you don't have it, we can use emojis
-// import { Music, Volume2, VolumeX } from "lucide-react";
 
 // --- Configuration ---
 const HERO_IMAGE = "/images/holding-hand-on-view.png";
 const CLOSING_IMAGE = "/images/holding-hand-on-view.png";
 const VIDEO_PATH = "/videos/our_video.mp4";
-const MUSIC_PATH = "/music/song.m4a"; // <--- Ensure this file exists
+const MUSIC_PATH = "/music/song.m4a";
 
-// Target Date: May 5, 2026 (6th Anniversary)
-const ANNIVERSARY_DATE = "2026-05-05T00:00:00";
+// ⚡️ FIXED DATE: May 17, 2026
+const ANNIVERSARY_DATE = "2026-05-17T00:00:00";
 
 const GALLERY_IMAGES = [
   "/images/love.jpg",
@@ -22,7 +20,7 @@ const REASONS = [
   "Two Virgos against the world (born just days apart!).",
   "2.5 years of long distance, yet you feel closer than ever.",
   "Even when we fight or cry, I always choose you.",
-  "Waiting for May 5th to celebrate 'Us'.",
+  "Waiting for May 17th to celebrate 'Us'.", // <--- Updated Text
   "No matter the distance, you are my home.",
 ];
 
@@ -163,7 +161,7 @@ const AnniversaryCountdown = () => {
 export default function ValentinePage() {
   const [reasonIndex, setReasonIndex] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false); // Controls the overlay
+  const [hasStarted, setHasStarted] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -179,15 +177,11 @@ export default function ValentinePage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-rose-100 font-sans selection:bg-rose-500 selection:text-white overflow-x-hidden">
-      {/* --- Audio Element (Hidden) --- */}
       <audio ref={audioRef} src={MUSIC_PATH} loop />
 
-      {/* --- START OVERLAY (Forces Interaction for Audio) --- */}
       {!hasStarted && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000">
-          {/* Floating Petals in Background of Overlay */}
           <RosePetals />
-
           <div className="z-10 text-center animate-pulse">
             <p className="text-rose-300 mb-4 tracking-widest uppercase text-xs">
               A Surprise for You
@@ -202,13 +196,11 @@ export default function ValentinePage() {
         </div>
       )}
 
-      {/* --- Main Content (Fades in after start) --- */}
       <div
         className={`transition-opacity duration-1000 ${hasStarted ? "opacity-100" : "opacity-0"}`}
       >
         <RosePetals />
 
-        {/* Floating Music Button (Optional control) */}
         <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={() => {
@@ -365,7 +357,8 @@ export default function ValentinePage() {
               <h2 className="text-white text-lg md:text-xl font-bold uppercase tracking-widest mb-4">
                 Countdown to Our 6th Anniversary
               </h2>
-              <p className="text-rose-300/70 mb-6 italic">May 5th, 2026</p>
+              {/* Updated Date Display */}
+              <p className="text-rose-300/70 mb-6 italic">May 17th, 2026</p>
               <AnniversaryCountdown />
             </div>
           </Reveal>
