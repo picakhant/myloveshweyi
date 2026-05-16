@@ -4,10 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 const HERO_IMAGE = "/images/holding-hand-on-view.png";
 const CLOSING_IMAGE = "/images/holding-hand-on-view.png";
 const VIDEO_PATH = "/videos/our_video.mp4";
-const MUSIC_PATH = "/music/song.m4a";
-
-// ⚡️ FIXED DATE: May 17, 2026
-const ANNIVERSARY_DATE = "2026-05-17T00:00:00";
+const MUSIC_PATH = "/music/song.m4a"; 
 
 const GALLERY_IMAGES = [
   "/images/love.jpg",
@@ -20,7 +17,7 @@ const REASONS = [
   "Two Virgos against the world (born just days apart!).",
   "2.5 years of long distance, yet you feel closer than ever.",
   "Even when we fight or cry, I always choose you.",
-  "Waiting for May 17th to celebrate 'Us'.", // <--- Updated Text
+  "Waiting for May 17th to celebrate 'Us'.",
   "No matter the distance, you are my home.",
 ];
 
@@ -109,52 +106,84 @@ const RosePetals = () => {
   );
 };
 
+// ⚡️ SMART COUNTDOWN COMPONENT
 const AnniversaryCountdown = () => {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [isAnniversary, setIsAnniversary] = useState(false);
+  const [anniversaryYear, setAnniversaryYear] = useState(6);
 
   useEffect(() => {
-    const target = new Date(ANNIVERSARY_DATE).getTime();
+    const calculateTime = () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      
+      // Check if today is May 17 (Months are 0-indexed, so May is 4)
+      const isToday = now.getMonth() === 4 && now.getDate() === 17;
+      setIsAnniversary(isToday);
 
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const difference = target - now;
+      // Base year you got together is 2020 (2026 - 6)
+      const baseYear = 2020;
+      
+      let targetYear = currentYear;
+      
+      // If we are past May 17th this year, target next year's anniversary
+      if (now.getMonth() > 4 || (now.getMonth() === 4 && now.getDate() > 17)) {
+        targetYear = currentYear + 1;
+      }
+      
+      // Set the dynamic year count (e.g., 2026 - 2020 = 6th, 2027 - 2020 = 7th)
+      setAnniversaryYear(targetYear - baseYear);
 
-      if (difference > 0) {
+      const target = new Date(targetYear, 4, 17, 0, 0, 0).getTime();
+      const difference = target - now.getTime();
+
+      if (difference > 0 && !isToday) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor(
-            (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-          ),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((difference % (1000 * 60)) / 1000),
         });
       }
-    }, 1000);
+    };
 
+    calculateTime(); // run immediately
+    const interval = setInterval(calculateTime, 1000); // update every second
     return () => clearInterval(interval);
   }, []);
 
+  // --- WHAT TO SHOW ON THE ACTUAL ANNIVERSARY DAY ---
+  if (isAnniversary) {
+    return (
+      <div className="bg-gradient-to-r from-rose-500 to-rose-700 text-white rounded-2xl p-6 md:p-8 border border-rose-300/30 shadow-[0_0_40px_rgba(225,29,72,0.5)] animate-pulse text-center max-w-sm mx-auto mt-8 transform hover:scale-105 transition-transform">
+        <h3 className="text-2xl md:text-3xl font-extrabold mb-3">Happy {anniversaryYear}th Anniversary! 🎉</h3>
+        <p className="text-sm md:text-base font-medium text-rose-100">
+          I love you more than words can say. Here is to us today, tomorrow, and forever. ❤️
+        </p>
+      </div>
+    );
+  }
+
+  // --- WHAT TO SHOW EVERY OTHER DAY (The Countdown) ---
   return (
-    <div className="grid grid-cols-4 gap-2 md:gap-4 text-center max-w-sm mx-auto mt-8">
-      {Object.entries(timeLeft).map(([unit, value]) => (
-        <div
-          key={unit}
-          className="bg-white/5 backdrop-blur-sm rounded-lg p-2 md:p-4 border border-white/10"
-        >
-          <div className="text-xl md:text-3xl font-bold text-rose-400">
-            {value}
+    <>
+      <p className="text-rose-300/70 mb-6 italic">May 17th, {new Date().getFullYear() + (new Date().getMonth() > 4 || (new Date().getMonth() === 4 && new Date().getDate() > 17) ? 1 : 0)}</p>
+      <div className="grid grid-cols-4 gap-2 md:gap-4 text-center max-w-sm mx-auto mt-2">
+        {Object.entries(timeLeft).map(([unit, value]) => (
+          <div
+            key={unit}
+            className="bg-white/5 backdrop-blur-sm rounded-lg p-2 md:p-4 border border-white/10 shadow-lg"
+          >
+            <div className="text-xl md:text-3xl font-bold text-rose-400">
+              {value}
+            </div>
+            <div className="text-[10px] md:text-xs text-rose-200/60 uppercase tracking-widest">
+              {unit}
+            </div>
           </div>
-          <div className="text-[10px] md:text-xs text-rose-200/60 uppercase tracking-widest">
-            {unit}
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -350,15 +379,13 @@ export default function ValentinePage() {
           </div>
         </section>
 
-        {/* --- COUNTDOWN SECTION --- */}
+        {/* --- SMART COUNTDOWN SECTION --- */}
         <section className="relative z-10 py-16 px-4">
           <Reveal>
             <div className="text-center">
               <h2 className="text-white text-lg md:text-xl font-bold uppercase tracking-widest mb-4">
-                Countdown to Our 6th Anniversary
+                Countdown to Our Next Anniversary
               </h2>
-              {/* Updated Date Display */}
-              <p className="text-rose-300/70 mb-6 italic">May 17th, 2026</p>
               <AnniversaryCountdown />
             </div>
           </Reveal>
